@@ -9,11 +9,6 @@
 #include "robot.hpp"
 
 class Common {
-private:
-  static Cell findCellWithPosition(int x, int y, int minX, int maxX,
-                                   int minY, int maxY);
-  static MegaCell findMegaCellWithPosition(int x, int y, int minX, int maxX,
-      int minY, int maxY);
 
 public:
   static Cell **cells;
@@ -22,13 +17,14 @@ public:
   static int rowCells;
   static int colCells;
 
-  static Cell findCell(int x, int y);
+  static Cell* findCell(int x, int y);
 
-  static MegaCell findMegaCell(int x, int y);
+  static MegaCell* findMegaCell(int x, int y);
 
-  static MegaCell findMegaCellByCell(Cell cell);
+  static MegaCell* findMegaCellByCell(Cell *cell);
 
-  static int* findIndexCell(Cell cell);
+  static int* findIndexCell(Cell* cell);
+  static int* findIndexMegaCell(MegaCell* megaCell);
 };
 
 #endif

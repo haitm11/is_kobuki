@@ -84,8 +84,6 @@ void MapService::initCell() {
     for (int colC = 0; colC < numberCol; colC++) {
       Common::cells[rowC][colC].setX(col);
       Common::cells[rowC][colC].setY(row + cellSize - 1);
-      Common::cells[rowC][colC].setCentreX(col + cellSize / 2);
-      Common::cells[rowC][colC].setCentreY(row + cellSize - 1 - cellSize / 2);
       Common::cells[rowC][colC].setCellSize(cellSize);
       Common::cells[rowC][colC].setObstacle(map.checkObstacle(col, row + cellSize - 1, cellSize));
       col = col + cellSize;
@@ -135,12 +133,12 @@ bool MapService::updateMap(is_kobuki::UpdateMap::Request& request,
   bool result = false;
 
   if (validRobotId(robotId) && validCell(row, col)) {
-    Cell cell = Common::cells[row][col];
+    Cell *cell = &Common::cells[row][col];
 
-    cell.setStatus((int) request.status);
-    MegaCell megaCell = Common::findMegaCellByCell(cell);
-    if (!megaCell.isNULL() && megaCell.isScaned()) {
-      megaCell.setStatus((int) request.status);
+    cell->setStatus((int) request.status);
+    MegaCell *megaCell = Common::findMegaCellByCell(cell);
+    if (!megaCell->isNULL() && megaCell->isScaned()) {
+      megaCell->setStatus((int) request.status);
       result = true;
     }
   }

@@ -97,20 +97,19 @@ void KobukiController::initCell() {
   // Khoi tao mang cells
 
   // Tinh so dong sau khi thu nho
-  int numberRow = ((up - down + 1) / cellSize);
+  int numberRow = ((up - down + 1) / cellSize) + 1;
   // Lam tron sao cho so dong chia het cho 2, de thuan tien cho viec chia megaCell
   if (numberRow % 2 != 0)
     numberRow--;
 
   // Tinh so cot sau khi thu nho
-  int numberCol = (right - left + 1) / cellSize;
+  int numberCol = (right - left + 1) / cellSize + 1;
   // Lam tron sao cho so cot chia het cho 2, de thuan tien cho viec chia megaCell
   if (numberCol % 2 != 0)
     numberCol--;
 
   // Cat bo phan pixel thua sao cho ban do vua khop so Cell
   left = right - numberCol * cellSize + 1;
-
   down = up - numberRow * cellSize + 1;
 
   Common::cells = new Cell*[numberRow];
@@ -123,8 +122,6 @@ void KobukiController::initCell() {
     for (int colC = 0; colC < numberCol; colC++) {
       Common::cells[rowC][colC].setX(col);
       Common::cells[rowC][colC].setY(row + cellSize - 1);
-      Common::cells[rowC][colC].setCentreX(col + cellSize / 2);
-      Common::cells[rowC][colC].setCentreY(row + cellSize - 1 - cellSize / 2);
       Common::cells[rowC][colC].setCellSize(cellSize);
       Common::cells[rowC][colC].setObstacle(map.checkObstacle(col, row + cellSize - 1, cellSize));
       col = col + cellSize;
@@ -162,6 +159,30 @@ void KobukiController::initCell() {
     rowM++;
     colM = 0;
   }
+
+  for(int i = Common::rowCells - 1; i >= 0; i--) {
+    for(int j = 0; j < Common::colCells; j++) {
+      if(Common::cells[i][j].hasObstacle())
+        printf("x");
+      else
+        printf("-");
+
+      if(j == (Common::colCells - 1))
+        printf("\n");
+    }
+  }
+
+  for(int i = Common::rowCells/2 - 1; i >= 0; i--) {
+    for(int j = 0; j < Common::colCells/2; j++) {
+      if(Common::megaCells[i][j].hasObstacle())
+        printf("x");
+      else
+        printf("-");
+
+      if(j == (Common::colCells/2 - 1))
+        printf("\n");
+    }
+  }
 }
 
 // Move robot with STC algorithm
@@ -170,6 +191,7 @@ void KobukiController::moveWithSTC() {
   // 500ms
   ros::Rate loop_rate(2);
   loop_rate.sleep();
+  for(int k=0;k<500000000;k++){}
 
   int row, col;
   int distanceX = currentCellX - left + 1;
@@ -178,24 +200,50 @@ void KobukiController::moveWithSTC() {
     col = distanceX / cellSize - 1;
   else
     col = distanceX / cellSize;
-
   if (distanceY % cellSize == 0)
     row = distanceY / cellSize - 1;
   else
     row = distanceY / cellSize;
 
-  stcNavigation.startCell = Common::cells[row][col];
-  stcNavigation.startMegaCell = Common::findMegaCellByCell(stcNavigation.startCell);
+  row = 18;
+  col = 3;
 
-  stcNavigation.currentCell = stcNavigation.startCell;
-  stcNavigation.currentMegaCell = stcNavigation.startMegaCell;
+  stcNavigation.currentCell = &Common::cells[row][col];
+  stcNavigation.currentCell->setStatus(SCANED);
+  stcNavigation.currentMegaCell = Common::findMegaCellByCell(stcNavigation.currentCell);
+  stcNavigation.currentMegaCell->setStatus(SCANED);
+
+  for(int i = Common::rowCells - 1; i >= 0; i--) {
+    for(int j = 0; j < Common::colCells; j++) {
+      if(i == row && j == col)
+        printf("o");
+      else if(Common::cells[i][j].hasObstacle())
+        printf("x");
+      else
+        printf("-");
+
+      if(j == (Common::colCells - 1))
+        printf("\n");
+    }
+  }
+
+  for(int i = Common::rowCells/2 - 1; i >= 0; i--) {
+    for(int j = 0; j < Common::colCells/2; j++) {
+      if(i == row/2 && j == col/2)
+        printf("o");
+      else if(Common::megaCells[i][j].hasObstacle())
+        printf("x");
+      else
+        printf("-");
+
+      if(j == (Common::colCells/2 - 1))
+        printf("\n");
+    }
+  }
 
   // Quet hang xom xung quanh megaCell hien tai
-  MegaCell megaCell = stcNavigation.scanNeighbor(1);
-
-  // Di chuyen lan dau tien
+  MegaCell* megaCell = stcNavigation.scanNeighbor(1);
   if (stcNavigation.passedMegaCellPath.empty() && (megaCell == stcNavigation.currentMegaCell)) {
-    // Ket thuc vi khong co duong di
     ROS_INFO("NO VALID PATH!");
     return;
   } else {
@@ -214,8 +262,8 @@ void KobukiController::moveWithSTC() {
 }
 
 // Move from currentMegaCell to megaCell
-void KobukiController::moveToMegaCell(MegaCell megaCell) {
-  Cell cell;
+void KobukiController::moveToMegaCell(MegaCell *megaCell) {
+  Cell *cell;
   // Kiem tra xem co duong di k?
   if (megaCell != stcNavigation.currentMegaCell) {
     stcNavigation.passedMegaCellPath.push(stcNavigation.currentMegaCell);
@@ -244,8 +292,8 @@ void KobukiController::moveToMegaCell(MegaCell megaCell) {
 }
 
 // Use movebase to move from currentCell to cell
-bool KobukiController::moveToCell(Cell cell, int direction) {
-  float distance = cell.getCellSize() * 0.05;
+bool KobukiController::moveToCell(Cell *cell, int direction) {
+  float distance = cell->getCellSize() * map.getResolution();
 
   switch (direction) {
   case D_UP:
@@ -265,9 +313,7 @@ bool KobukiController::moveToCell(Cell cell, int direction) {
   }
 
   reMove();
-  cell.setStatus(SCANED);
-  int *index = Common::findIndexCell(cell);
-  Common::cells[index[0]][index[1]].setStatus(SCANED);
+  cell->setStatus(SCANED);
 
   system("clear");
   ROS_INFO("Cell: ");
@@ -297,8 +343,8 @@ bool KobukiController::moveToCell(Cell cell, int direction) {
       if (j == Common::colCells / 2 - 1)
         printf("\n");
     }
-
-  updateMap(cell);
+  if(robotId != 0)
+    updateMap(*cell);
   return true;
 }
 
@@ -413,7 +459,7 @@ int KobukiController::updateMap(Cell cell) {
   is_kobuki::UpdateMap msg;
   bool result = false;
 
-  int* index = Common::findIndexCell(cell);
+  int* index = Common::findIndexCell(&cell);
   msg.request.col = index[0];
   msg.request.row = index[1];
   msg.request.status = cell.getStatus();

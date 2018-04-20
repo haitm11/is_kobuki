@@ -1,7 +1,7 @@
 
 #include "../../include/stc/stc_navigation.hpp"
 
-bool STCNavigation::checkPassedMegaCell(MegaCell megaCell) {
+bool STCNavigation::checkPassedMegaCell(MegaCell *megaCell) {
   for (int i = 0; i < passedMegaCell.size(); i++) {
     if (passedMegaCell[i] == megaCell)
       return true;
@@ -9,8 +9,8 @@ bool STCNavigation::checkPassedMegaCell(MegaCell megaCell) {
   return false;
 }
 
-bool STCNavigation::validMegaCell(MegaCell megaCell) {
-  if (megaCell.hasObstacle()) {
+bool STCNavigation::validMegaCell(MegaCell *megaCell) {
+  if (megaCell->hasObstacle()) {
     return false;
   }
 
@@ -18,20 +18,20 @@ bool STCNavigation::validMegaCell(MegaCell megaCell) {
 }
 
 int STCNavigation::getDirection() {
-  if ((parentMegaCell.getX() == currentMegaCell.getX()) &&
-      (parentMegaCell.getY() > currentMegaCell.getY()))
+  if ((parentMegaCell->getX() == currentMegaCell->getX()) &&
+      (parentMegaCell->getY() > currentMegaCell->getY()))
     return D_DOWN;
 
-  if ((parentMegaCell.getX() < currentMegaCell.getX()) &&
-      (parentMegaCell.getY() == currentMegaCell.getY()))
+  if ((parentMegaCell->getX() < currentMegaCell->getX()) &&
+      (parentMegaCell->getY() == currentMegaCell->getY()))
     return D_RIGHT;
 
-  if ((parentMegaCell.getX() == currentMegaCell.getX()) &&
-      (parentMegaCell.getY() < currentMegaCell.getY()))
+  if ((parentMegaCell->getX() == currentMegaCell->getX()) &&
+      (parentMegaCell->getY() < currentMegaCell->getY()))
     return D_UP;
 
-  if ((parentMegaCell.getX() > currentMegaCell.getX()) &&
-      (parentMegaCell.getY() == currentMegaCell.getY()))
+  if ((parentMegaCell->getX() > currentMegaCell->getX()) &&
+      (parentMegaCell->getY() == currentMegaCell->getY()))
     return D_LEFT;
 }
 
@@ -50,11 +50,11 @@ void STCNavigation::clearPath() {
 }
 
 //  Return first availabe MegaCell;
-MegaCell STCNavigation::scanNeighbor(int isInitialize) {
-  MegaCell neighborLEFT = currentMegaCell.getNeighbor(LEFT);
-  MegaCell neighborRIGHT = currentMegaCell.getNeighbor(RIGHT);
-  MegaCell neighborUP = currentMegaCell.getNeighbor(UP);
-  MegaCell neighborDOWN = currentMegaCell.getNeighbor(DOWN);
+MegaCell* STCNavigation::scanNeighbor(int isInitialize) {
+  MegaCell* neighborLEFT = currentMegaCell->getNeighbor(LEFT);
+  MegaCell* neighborRIGHT = currentMegaCell->getNeighbor(RIGHT);
+  MegaCell* neighborUP = currentMegaCell->getNeighbor(UP);
+  MegaCell* neighborDOWN = currentMegaCell->getNeighbor(DOWN);
 
   // Khi robot quet lan dau tien, bau dau tu vi tri xuat phat
   if (isInitialize == 1) {
@@ -105,41 +105,41 @@ MegaCell STCNavigation::scanNeighbor(int isInitialize) {
 }
 
 // Generate path from currentMegaCell to megaCell into passedCellPath
-void STCNavigation::generatePath(MegaCell megaCell) {
+void STCNavigation::generatePath(MegaCell* megaCell) {
   clearPassedCellPath();
 
-  int cellPosition = currentMegaCell.getCellPosition(currentCell);
-  int megaCellPosition = currentMegaCell.getMegaCellPosition(megaCell);
+  int cellPosition = currentMegaCell->getCellPosition(currentCell);
+  int megaCellPosition = currentMegaCell->getMegaCellPosition(megaCell);
 
   // megaCell UP, current DOWN
   if (megaCellPosition == UP) {
     switch (cellPosition) {
     case TOP_LEFT:
-      passedCellPath.push(currentCell.getNeighbor(DOWN));
+      passedCellPath.push(currentCell->getNeighbor(DOWN));
       passedCellDirection.push(changeCurrentDirection(DOWN));
-      passedCellPath.push(currentCell.getNeighbor(DOWN).getNeighbor(RIGHT));
+      passedCellPath.push(currentCell->getNeighbor(DOWN)->getNeighbor(RIGHT));
       passedCellDirection.push(changeCurrentDirection(RIGHT));
-      passedCellPath.push(currentCell.getNeighbor(DOWN).getNeighbor(RIGHT).getNeighbor(UP));
+      passedCellPath.push(currentCell->getNeighbor(DOWN)->getNeighbor(RIGHT)->getNeighbor(UP));
       passedCellDirection.push(changeCurrentDirection(UP));
-      passedCellPath.push(currentCell.getNeighbor(DOWN).getNeighbor(RIGHT).getNeighbor(UP).getNeighbor(UP));
+      passedCellPath.push(currentCell->getNeighbor(DOWN)->getNeighbor(RIGHT)->getNeighbor(UP)->getNeighbor(UP));
       passedCellDirection.push(changeCurrentDirection(UP));
       break;
     case TOP_RIGHT:
-      passedCellPath.push(currentCell.getNeighbor(UP));
+      passedCellPath.push(currentCell->getNeighbor(UP));
       passedCellDirection.push(changeCurrentDirection(UP));
       break;
     case BOTTOM_LEFT:
-      passedCellPath.push(currentCell.getNeighbor(RIGHT));
+      passedCellPath.push(currentCell->getNeighbor(RIGHT));
       passedCellDirection.push(changeCurrentDirection(RIGHT));
-      passedCellPath.push(currentCell.getNeighbor(RIGHT).getNeighbor(UP));
+      passedCellPath.push(currentCell->getNeighbor(RIGHT)->getNeighbor(UP));
       passedCellDirection.push(changeCurrentDirection(UP));
-      passedCellPath.push(currentCell.getNeighbor(RIGHT).getNeighbor(UP).getNeighbor(UP));
+      passedCellPath.push(currentCell->getNeighbor(RIGHT)->getNeighbor(UP)->getNeighbor(UP));
       passedCellDirection.push(changeCurrentDirection(UP));
       break;
     case BOTTOM_RIGHT:
-      passedCellPath.push(currentCell.getNeighbor(UP));
+      passedCellPath.push(currentCell->getNeighbor(UP));
       passedCellDirection.push(changeCurrentDirection(UP));
-      passedCellPath.push(currentCell.getNeighbor(UP).getNeighbor(UP));
+      passedCellPath.push(currentCell->getNeighbor(UP)->getNeighbor(UP));
       passedCellDirection.push(changeCurrentDirection(UP));
       break;
     }
@@ -149,31 +149,31 @@ void STCNavigation::generatePath(MegaCell megaCell) {
   if (megaCellPosition == LEFT) {
     switch (cellPosition) {
     case TOP_LEFT:
-      passedCellPath.push(currentCell.getNeighbor(LEFT));
+      passedCellPath.push(currentCell->getNeighbor(LEFT));
       passedCellDirection.push(changeCurrentDirection(LEFT));
       break;
     case BOTTOM_LEFT:
-      passedCellPath.push(currentCell.getNeighbor(RIGHT));
+      passedCellPath.push(currentCell->getNeighbor(RIGHT));
       passedCellDirection.push(changeCurrentDirection(RIGHT));
-      passedCellPath.push(currentCell.getNeighbor(RIGHT).getNeighbor(UP));
+      passedCellPath.push(currentCell->getNeighbor(RIGHT)->getNeighbor(UP));
       passedCellDirection.push(changeCurrentDirection(UP));
-      passedCellPath.push(currentCell.getNeighbor(RIGHT).getNeighbor(UP).getNeighbor(LEFT));
+      passedCellPath.push(currentCell->getNeighbor(RIGHT)->getNeighbor(UP)->getNeighbor(LEFT));
       passedCellDirection.push(changeCurrentDirection(LEFT));
-      passedCellPath.push(currentCell.getNeighbor(RIGHT).getNeighbor(UP).getNeighbor(LEFT).getNeighbor(LEFT));
+      passedCellPath.push(currentCell->getNeighbor(RIGHT)->getNeighbor(UP)->getNeighbor(LEFT)->getNeighbor(LEFT));
       passedCellDirection.push(changeCurrentDirection(LEFT));
       break;
     case BOTTOM_RIGHT:
-      passedCellPath.push(currentCell.getNeighbor(UP));
+      passedCellPath.push(currentCell->getNeighbor(UP));
       passedCellDirection.push(changeCurrentDirection(UP));
-      passedCellPath.push(currentCell.getNeighbor(UP).getNeighbor(LEFT));
+      passedCellPath.push(currentCell->getNeighbor(UP)->getNeighbor(LEFT));
       passedCellDirection.push(changeCurrentDirection(LEFT));
-      passedCellPath.push(currentCell.getNeighbor(UP).getNeighbor(LEFT).getNeighbor(LEFT));
+      passedCellPath.push(currentCell->getNeighbor(UP)->getNeighbor(LEFT)->getNeighbor(LEFT));
       passedCellDirection.push(changeCurrentDirection(LEFT));
       break;
     case TOP_RIGHT:
-      passedCellPath.push(currentCell.getNeighbor(LEFT));
+      passedCellPath.push(currentCell->getNeighbor(LEFT));
       passedCellDirection.push(changeCurrentDirection(LEFT));
-      passedCellPath.push(currentCell.getNeighbor(LEFT).getNeighbor(LEFT));
+      passedCellPath.push(currentCell->getNeighbor(LEFT)->getNeighbor(LEFT));
       passedCellDirection.push(changeCurrentDirection(LEFT));
       break;
     }
@@ -183,31 +183,31 @@ void STCNavigation::generatePath(MegaCell megaCell) {
   if (megaCellPosition == DOWN) {
     switch (cellPosition) {
     case BOTTOM_RIGHT:
-      passedCellPath.push(currentCell.getNeighbor(UP));
+      passedCellPath.push(currentCell->getNeighbor(UP));
       passedCellDirection.push(changeCurrentDirection(UP));
-      passedCellPath.push(currentCell.getNeighbor(UP).getNeighbor(LEFT));
+      passedCellPath.push(currentCell->getNeighbor(UP)->getNeighbor(LEFT));
       passedCellDirection.push(changeCurrentDirection(LEFT));
-      passedCellPath.push(currentCell.getNeighbor(UP).getNeighbor(LEFT).getNeighbor(DOWN));
+      passedCellPath.push(currentCell->getNeighbor(UP)->getNeighbor(LEFT)->getNeighbor(DOWN));
       passedCellDirection.push(changeCurrentDirection(DOWN));
-      passedCellPath.push(currentCell.getNeighbor(UP).getNeighbor(LEFT).getNeighbor(DOWN).getNeighbor(DOWN));
+      passedCellPath.push(currentCell->getNeighbor(UP)->getNeighbor(LEFT)->getNeighbor(DOWN)->getNeighbor(DOWN));
       passedCellDirection.push(changeCurrentDirection(DOWN));
       break;
     case BOTTOM_LEFT:
-      passedCellPath.push(currentCell.getNeighbor(DOWN));
+      passedCellPath.push(currentCell->getNeighbor(DOWN));
       passedCellDirection.push(changeCurrentDirection(DOWN));
       break;
     case TOP_RIGHT:
-      passedCellPath.push(currentCell.getNeighbor(LEFT));
+      passedCellPath.push(currentCell->getNeighbor(LEFT));
       passedCellDirection.push(changeCurrentDirection(LEFT));
-      passedCellPath.push(currentCell.getNeighbor(LEFT).getNeighbor(DOWN));
+      passedCellPath.push(currentCell->getNeighbor(LEFT)->getNeighbor(DOWN));
       passedCellDirection.push(changeCurrentDirection(DOWN));
-      passedCellPath.push(currentCell.getNeighbor(LEFT).getNeighbor(DOWN).getNeighbor(DOWN));
+      passedCellPath.push(currentCell->getNeighbor(LEFT)->getNeighbor(DOWN)->getNeighbor(DOWN));
       passedCellDirection.push(changeCurrentDirection(DOWN));
       break;
     case TOP_LEFT:
-      passedCellPath.push(currentCell.getNeighbor(DOWN));
+      passedCellPath.push(currentCell->getNeighbor(DOWN));
       passedCellDirection.push(changeCurrentDirection(DOWN));
-      passedCellPath.push(currentCell.getNeighbor(DOWN).getNeighbor(DOWN));
+      passedCellPath.push(currentCell->getNeighbor(DOWN)->getNeighbor(DOWN));
       passedCellDirection.push(changeCurrentDirection(DOWN));
       break;
     }
@@ -217,31 +217,31 @@ void STCNavigation::generatePath(MegaCell megaCell) {
   if (megaCellPosition == RIGHT) {
     switch (cellPosition) {
     case TOP_RIGHT:
-      passedCellPath.push(currentCell.getNeighbor(LEFT));
+      passedCellPath.push(currentCell->getNeighbor(LEFT));
       passedCellDirection.push(changeCurrentDirection(LEFT));
-      passedCellPath.push(currentCell.getNeighbor(LEFT).getNeighbor(DOWN));
+      passedCellPath.push(currentCell->getNeighbor(LEFT)->getNeighbor(DOWN));
       passedCellDirection.push(changeCurrentDirection(DOWN));
-      passedCellPath.push(currentCell.getNeighbor(LEFT).getNeighbor(DOWN).getNeighbor(RIGHT));
+      passedCellPath.push(currentCell->getNeighbor(LEFT)->getNeighbor(DOWN)->getNeighbor(RIGHT));
       passedCellDirection.push(changeCurrentDirection(RIGHT));
-      passedCellPath.push(currentCell.getNeighbor(LEFT).getNeighbor(DOWN).getNeighbor(RIGHT).getNeighbor(RIGHT));
+      passedCellPath.push(currentCell->getNeighbor(LEFT)->getNeighbor(DOWN)->getNeighbor(RIGHT)->getNeighbor(RIGHT));
       passedCellDirection.push(changeCurrentDirection(RIGHT));
       break;
     case BOTTOM_RIGHT:
-      passedCellPath.push(currentCell.getNeighbor(RIGHT));
+      passedCellPath.push(currentCell->getNeighbor(RIGHT));
       passedCellDirection.push(changeCurrentDirection(RIGHT));
       break;
     case TOP_LEFT:
-      passedCellPath.push(currentCell.getNeighbor(DOWN));
+      passedCellPath.push(currentCell->getNeighbor(DOWN));
       passedCellDirection.push(changeCurrentDirection(DOWN));
-      passedCellPath.push(currentCell.getNeighbor(DOWN).getNeighbor(RIGHT));
+      passedCellPath.push(currentCell->getNeighbor(DOWN)->getNeighbor(RIGHT));
       passedCellDirection.push(changeCurrentDirection(RIGHT));
-      passedCellPath.push(currentCell.getNeighbor(DOWN).getNeighbor(RIGHT).getNeighbor(RIGHT));
+      passedCellPath.push(currentCell->getNeighbor(DOWN)->getNeighbor(RIGHT)->getNeighbor(RIGHT));
       passedCellDirection.push(changeCurrentDirection(RIGHT));
       break;
     case BOTTOM_LEFT:
-      passedCellPath.push(currentCell.getNeighbor(RIGHT));
+      passedCellPath.push(currentCell->getNeighbor(RIGHT));
       passedCellDirection.push(changeCurrentDirection(RIGHT));
-      passedCellPath.push(currentCell.getNeighbor(RIGHT).getNeighbor(RIGHT));
+      passedCellPath.push(currentCell->getNeighbor(RIGHT)->getNeighbor(RIGHT));
       passedCellDirection.push(changeCurrentDirection(RIGHT));
       break;
     }

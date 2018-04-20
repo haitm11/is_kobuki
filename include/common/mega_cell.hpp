@@ -63,22 +63,19 @@ public:
   void setStatus(int status);
 
   // Tra ve cell trong megaCell theo position
-  Cell getCell(int position);
+  Cell *getCell(int position);
 
   // Tra ve vi tri position cua cell
-  int getCellPosition(Cell cell);
+  int getCellPosition(Cell *cell);
 
   // Tra ve vi tri tuong doi cua megaCell so voi this
-  int getMegaCellPosition(MegaCell megaCell);
-
-  // Tra ve danh sach cell trong megaCell this
-  Cell* getCells();
+  int getMegaCellPosition(MegaCell *megaCell);
 
   // Kiem tra megaCell da quet het chua
   bool isScaned();
 
   // Lay megaCell xung quanh, theo chieu nguoc chieu kim dong ho.
-  MegaCell getNeighbor(int position);
+  MegaCell* getNeighbor(int position);
 
   // So sanh megaCell == other
   bool operator==(const MegaCell &other);

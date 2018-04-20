@@ -91,7 +91,7 @@ public:
     stcNavigation = STCNavigation();
     map = Map();
     initMap = true;
-    cellSize = 16;
+    cellSize = 8;
     PI = 3.1415926535897;
     PI_MOVE = 2.8;
     angularSpeed = PI / 8;
@@ -100,6 +100,7 @@ public:
     epsilonX = 0.05;
     epsilonY = 0.05;
     epsilonTheta = 0.05;
+    robotId = 0;
   }
 
   // Destructor
@@ -131,10 +132,10 @@ public:
   void moveWithSTC();
 
   // Di chuyen giua cac megaCell (Tu currentMegaCell toi megaCell)
-  void moveToMegaCell(MegaCell megaCell);
+  void moveToMegaCell(MegaCell *megaCell);
 
   // Di chuyen giua cac cell (Tu currentCell toi nextCell)
-  bool moveToCell(Cell nextCell, int direction);
+  bool moveToCell(Cell *nextCell, int direction);
 
   void turn(float degree);
   void turnLeft();

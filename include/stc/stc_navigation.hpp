@@ -9,53 +9,49 @@
 
 class STCNavigation {
 public:
-  Cell startCell;
-  MegaCell startMegaCell;
+  Cell *currentCell;
+  MegaCell *currentMegaCell;
 
-  Cell currentCell;
-  MegaCell currentMegaCell;
-
-  Cell parentCell;
-  MegaCell parentMegaCell;
+  MegaCell *parentMegaCell;
 
   int currentDirection;
 
   // Luu toan bo cac cell da di qua, dung cho viec sinh duong di
-  std::queue<Cell> passedCellPath;
+  std::queue<Cell*> passedCellPath;
   std::queue<int> passedCellDirection;
 
   // Luu toan bo cac Megacell da di qua, dung de cho viec sinh duong di
-  std::stack<MegaCell> passedMegaCellPath;
+  std::stack<MegaCell*> passedMegaCellPath;
 
   // Chua nhung MegaCell da di qua.
-  std::vector<MegaCell> passedMegaCell;
+  std::vector<MegaCell*> passedMegaCell;
 
   // Constructor
   STCNavigation() {
-    passedCellPath = std::queue<Cell>();
+    passedCellPath = std::queue<Cell*>();
     passedCellDirection = std::queue<int>();
-    passedMegaCellPath = std::stack<MegaCell>();
-    passedMegaCell = std::vector<MegaCell>();
-    currentDirection = D_DOWN;
+    passedMegaCellPath = std::stack<MegaCell*>();
+    passedMegaCell = std::vector<MegaCell*>();
+    currentDirection = D_UP;
   }
 
   // Destructor
   ~STCNavigation() {}
 
   // Kiem tra megaCell da di qua chua?
-  bool checkPassedMegaCell(MegaCell megaCell);
+  bool checkPassedMegaCell(MegaCell *megaCell);
 
   // Kiem tra megaCell co the di vao duoc k?
-  bool validMegaCell(MegaCell megaCell);
+  bool validMegaCell(MegaCell *megaCell);
 
   // Lay huong cua robot. (Kiem tra huong giua parentMegaCell va currentMegaCell)
   int getDirection();
 
   // Scan valid neighbor
-  MegaCell scanNeighbor(int isInitialize);
+  MegaCell* scanNeighbor(int isInitialize);
 
   // Generate path from this cell to megaCell
-  void generatePath(MegaCell megaCell);
+  void generatePath(MegaCell *megaCell);
 
   int changeCurrentDirection(int direction);
 

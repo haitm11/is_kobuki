@@ -41,7 +41,7 @@ void MegaCell::setStatus(int status) {
 }
 
 // Tra ve cell trong megaCell theo position
-Cell MegaCell::getCell(int position) {
+Cell* MegaCell::getCell(int position) {
   int x, y;
   if (position == TOP_LEFT) {
     x = getX();
@@ -67,63 +67,53 @@ Cell MegaCell::getCell(int position) {
 }
 
 // Tra ve vi tri position cua cell
-int MegaCell::getCellPosition(Cell cell) {
-  if ((getX() == cell.getX()) && (getY() == cell.getY()))
+int MegaCell::getCellPosition(Cell *cell) {
+  if ((getX() == cell->getX()) && (getY() == cell->getY()))
     return TOP_LEFT;
 
-  if ((getX() == cell.getX()) && (getY() - cell.getY() == cell.getCellSize()))
+  if ((getX() == cell->getX()) && (getY() - cell->getY() == cell->getCellSize()))
     return BOTTOM_LEFT;
 
-  if ((cell.getX() - getX() == cell.getCellSize()) && (getY() == cell.getY()))
+  if ((cell->getX() - getX() == cell->getCellSize()) && (getY() == cell->getY()))
     return TOP_RIGHT;
 
-  if ((cell.getX() - getX() == cell.getCellSize()) && (getY() - cell.getY() == cell.getCellSize()))
+  if ((cell->getX() - getX() == cell->getCellSize()) && (getY() - cell->getY() == cell->getCellSize()))
     return BOTTOM_RIGHT;
 
   return -1;
 }
 
 // Tra ve vi tri tuong doi cua megaCell so voi this
-int MegaCell::getMegaCellPosition(MegaCell megaCell) {
-  if ((megaCell.getX() == getX()) && (megaCell.getY() > getY()))
+int MegaCell::getMegaCellPosition(MegaCell *megaCell) {
+  if ((megaCell->getX() == getX()) && (megaCell->getY() - getY() == getCellSize()*2))
     return UP;
 
-  if ((megaCell.getX() < getX()) && (megaCell.getY() == getY()))
+  if ((getX() - megaCell->getX() == getCellSize()*2 ) && (megaCell->getY() == getY()))
     return LEFT;
 
-  if ((megaCell.getX() == getX()) && (megaCell.getY() < getY()))
+  if ((megaCell->getX() == getX()) && (getY() - megaCell->getY() == getCellSize()*2))
     return DOWN;
 
-  if ((megaCell.getX() > getX()) && (megaCell.getY() == getY()))
+  if ((megaCell->getX() - getX() == getCellSize()*2) && (megaCell->getY() == getY()))
     return RIGHT;
 
   return -1;
 }
 
-// Tra ve cac cell cua megaCell
-Cell* MegaCell::getCells() {
-  Cell* cells = (Cell*) malloc(4 * sizeof(Cell));
-  cells[0] = getCell(TOP_LEFT);
-  cells[1] = getCell(BOTTOM_LEFT);
-  cells[2] = getCell(TOP_RIGHT);
-  cells[3] = getCell(BOTTOM_RIGHT);
-  return cells;
-}
-
 bool MegaCell::isScaned() {
-  Cell* cells = getCells();
+  Cell* cellTopLeft = getCell(TOP_LEFT);
+  Cell* cellTopRight = getCell(TOP_RIGHT);
+  Cell* cellBottomLeft = getCell(BOTTOM_LEFT);
+  Cell* cellBottomRight = getCell(BOTTOM_RIGHT);
   bool scaned = true;
-  for (int i = 0; i < 4; i++)
-    if (cells[i].getStatus() == WAITING) {
-      scaned = false;
-      break;
-    }
-
+  if (cellTopLeft->getStatus() == WAITING || cellTopRight->getStatus() == WAITING
+   || cellBottomLeft->getStatus() == WAITING || cellBottomRight->getStatus() == WAITING)
+    scaned = false;
   return scaned;
 }
 
 // Lay megaCell xung quanh, theo chieu nguoc chieu kim dong ho.
-MegaCell MegaCell::getNeighbor(int position) {
+MegaCell* MegaCell::getNeighbor(int position) {
   int x, y;
   if (position == UP) {
     x = getX();
